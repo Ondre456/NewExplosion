@@ -1,22 +1,18 @@
 using UnityEngine;
 
+[RequireComponent(typeof(SphereCollider))]
 public class Explosion : MonoBehaviour
 {
     private float _power;
     private float _distance;
     private float _duration;
     private float _currentRadius;
-    private float _initialRadius;
-
     private SphereCollider _collider;
 
     private void Awake()
     {
-        _distance = 5;
-        _power = 2;
-        _initialRadius = 0;
-        _duration = 0.1f;
-        _collider = gameObject.AddComponent<SphereCollider>();
+        _currentRadius = 0;
+        _collider = gameObject.GetComponent<SphereCollider>();
     }
 
     private void FixedUpdate()
@@ -39,7 +35,15 @@ public class Explosion : MonoBehaviour
         if (rb != null)
         {
             Vector3 direction = (other.transform.position - transform.position).normalized;
-            rb.AddForce(direction * _power, ForceMode.Impulse);
+            rb.AddForce((direction * _power) / _currentRadius, ForceMode.Impulse);
         }
+    }
+
+    public void AcceptExplosionCharacteristics(float mass, float powerModifier)
+    {
+        const int DistanceMultiplier = 5;
+
+        _power = powerModifier * mass;
+        _distance = _power * DistanceMultiplier;
     }
 }
